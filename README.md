@@ -1,7 +1,41 @@
 # 2020graphics1
 # week01
+## 第一個 OpenGL程式:
+```
+    1.安裝CodeBlock 17.12版後，打開
 
-
+    2.按File-New-Project→選OpenGL專案
+    3.選桌面+打檔名，按下一步
+     4.建立好後，按Build&Run就能看到彩色旋轉三角形
+```
+## 第一個GLUT專案:
+```
+  1.上Moodle →上課用軟體中下載freeglut-MinGW-3.0.0-1.mp.zip檔→解壓縮到桌面
+  2.解壓縮後，點開 freeglut 資料夾裡的 lib 資料夾
+  3.其中libfreeglut.a檔複製一份改檔名→libglut32.a (這樣才能讓CodeBlock 的GLUT專案連結使用) 
+  4.開啟CodeBlock→File-New-Project→選GLUT專案
+  5.取檔名 
+  6.設定 GLUT 目錄 C:\Users\????\Desktop\freeglut  (中間會跳出一個視窗直接關掉就行)
+  7.按Build&Run，就會有六個東西在跑(按+/-可以調整圖的精細度)
+```
+## 建立新的Github倉庫/和備份(步驟4以後):
+```
+1.登入Github，新增新的專案倉庫
+2.取名為2020graphics1
+3.Public ，Add README ，gitignore 選C++ →建立完成
+4.下載 Git for windows並安裝
+5.開啟Git Bash 
+6. 輸入cd desktop → git clone https://github.com/ajian-tsai/2020graphics1 
+    → cd 2020graphics1 (將github有的東西載下來)
+7.將要存的檔案放入2020graphics1 資料夾
+8.輸入 git status 查看狀態(有紅色的代表有新存入的東西)
+9.輸入 git add . 把資料加進去 → 再次查看資料是否完成(輸入 git status，都綠色代表完成 )
+  =推入雲端=
+*10.第一次登入需要commit →輸入 git config --global user.email " 你的信箱 " 
+    →輸入 git config --global user.name "名字"*
+11. 輸入 git commit -m "輸入你要的訊息"
+12. 最後輸入 git push 推上雲端
+```
 # week02
 ## 練習範例
 ```
