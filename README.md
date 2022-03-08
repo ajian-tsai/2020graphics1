@@ -120,3 +120,93 @@ int main(int argc, char** argv)///Main主函式
     glutMainLoop();///主要程式迴圈運作
 }
 ```
+## week03
+# ★小技巧:
+```
+    1.利用#include <math.h>可以用sin()、cos()
+
+    2. 以下程式碼可以形成圓形:(x,y可以更改圖形的位置)
+
+        void mycirle( flaot x , flaot y , float r){
+
+               glBegin(GL_POLYGON);
+
+               for( float a=0 ; a<3.1415926*2 ; a+=0.01){  ///乘2拿掉會有半圓 a讓圓的點變多
+
+                   glVertex2f( x+r*cos(a), y+r*sin(a) );
+
+               }
+
+                glEnd();
+
+        } 
+```
+# 練習範例:
+```
+    1.去jsyeh.org/3dcg10/下載 data 跟win32
+
+    2.windows 解壓縮到windows\
+
+        data解壓縮後放進剛剛解壓縮的windows
+
+    3.執行今天要用的windows/Tranformation.exe:
+
+        右上角Screen-space view視窗 按右鍵:可以選擇其他形狀。
+
+        中下 Command manipulation window視窗按右鍵:可以調整旋轉、位置等的數值。
+```
+# 建立GLUT專案-Translate(移動):
+另加函式簡化程式碼:
+  更改x和y的值就能一次創造多的茶壺。
+```c++
+#include <GL/glut.h>
+void tea(float x, float y)
+{
+    glPushMatrix();///備份舊的位置的矩陣
+        glTranslatef( x , y , 0);///改變位置，不過這個移動會累積，所以要用push 跟pop 來固定位置。Translatef(f前面沒有數字)
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+
+    tea(0.5,0.5);
+    tea(0.5,-0.5);
+    tea(-0.5,-0.5);
+    tea(-0.5,0.5);
+
+    glutSwapBuffers();
+}
+int main(int argc,char**argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("第三周Translate");
+
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+
+```
+  
+# 能利用滑鼠控制的專案:
+```
+
+```
+
+```c++
+
+```
+
+## week04
+#
+```
+
+```
+#
+```
+
+```
