@@ -309,6 +309,7 @@ int main(int argc,char**argv)
 ```
 
 # 練習滑鼠mouse motion轉動:
+★ x是滑鼠左右移動，y是滑鼠上下移動 ★
 ```
 #include <GL/glut.h>
 float angle;///角度
