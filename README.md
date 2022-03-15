@@ -344,6 +344,7 @@ int main(int argc,char**argv)
 ```
 ★ 因為轉動會每次重新點位置轉動，以下是解決方式★ 
 # 利用mouse 點擊紀錄位置修正:
+★ 利用原先的位置和後來移動的位置做修正★
 ```c++
 #include <GL/glut.h>
 float angle,oldx=0;///角度
