@@ -289,7 +289,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 
      glPushMatrix();///備份舊的矩陣
-          glRotatef( 90 ,0 ,0,1);///旋轉Z軸
+          glRotatef( 90 ,0 ,0,1);///旋轉Z軸90度
           glColor3f(1,1,0);
           glutSolidTeapot(0.3);
      glPopMatrix();///還原矩陣
