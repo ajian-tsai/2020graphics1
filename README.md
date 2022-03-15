@@ -268,19 +268,78 @@ int main(int argc,char**argv)
 }
 ```
 ## 第四周
-# 
+# 範例理解glRotatef運作方式:
+```
+    1.上jsyeh.org/3dcg10/ 下載data和win32 解壓縮，點開Tranformation.exe。
+    2.可以調整glRotatef的值
+        (可按照x,y,z旋轉，利用安培右手定則，拇指指向x或y或z，則四指為旋轉方向)。
+        glRotatef( 旋轉角度 , X軸 ,Y軸 ,Z軸) 
+    Ex:
+        如果旋轉X軸glRotatef(0 , 1.00 ,0 ,0)，則人物會向前旋轉 (像敬禮的動作)。
+        如果旋轉Z軸glRotatef(0 , 0 ,0 ,1.00)，則人物會整個往左轉，像側翻 
+        (此時的拇指是指向人物面向的方向)。
+        如果是glRotatef(0 , 1.00 ,1.00 ,0)，拇指方向會朝右上。
 ```
 
+# 練習glRotatef專案:
+```c++
+#include <GL/glut.h>
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+
+     glPushMatrix();///備份舊的矩陣
+          glRotatef( 90 ,0 ,0,1);///旋轉Z軸
+          glColor3f(1,1,0);
+          glutSolidTeapot(0.3);
+     glPopMatrix();///還原矩陣
+
+    glutSwapBuffers();
+}
+int main(int argc,char**argv)
+{
+     glutInit(&argc,argv);
+     glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+     glutCreateWindow("第三周 Rotate");
+
+     glutDisplayFunc(display);
+
+     glutMainLoop();
+}
 ```
 
-# 
+# 練習滑鼠mouse motion轉動:
 ```
+#include <GL/glut.h>
+float angle;///角度
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 
-```
+     glPushMatrix();///備份舊的矩陣
+          glRotatef( angle ,0 ,0,1);///旋轉Z軸
+          glColor3f(1,1,0);
+          glutSolidTeapot(0.3);
+     glPopMatrix();///還原矩陣
 
-# 
-```
+    glutSwapBuffers();
+}
+void motion(int x,int y)
+{
+    angle = x;
+    display();///每滑動滑鼠，就重畫茶壺
+}
+int main(int argc,char**argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("第三周 Rotate");
 
+    glutMotionFunc(motion); 
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
 ```
 
 # 
