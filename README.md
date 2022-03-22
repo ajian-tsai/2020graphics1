@@ -383,23 +383,155 @@ int main(int argc,char**argv)
 }
 ```
 ## 第五周
-# 
+# 範例:老師的範例Tranformation.exe
 ```
+下面視窗(Command manipulation window)右鍵可以交換位置(translate)跟旋轉(rotate)的程式執行順序。分別會顯示自轉跟公轉效果!
+```
+
+# 利用glutKeyboardFunc()函式使用鍵盤:
+```
+1.先建立一個glutKeyboardFunc(keyboard)在Main裡。
+
+2.在建立函式void keyboard( unsigned char key , int x , int y) 
+   key會去偵測你鍵盤的英文輸入和數字，x和y會去顯示你滑鼠指的位置。
+```
+```c
+#include <GL/glut.h>
+#include <stdio.h>
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,0);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int x,int y)
+{
+    printf("你按下了%c 在 %d %d 的座標\n",key ,x ,y);
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05 keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+
+    glutMainLoop();
+}
+```
+# 結合之前mouse (滑鼠)、motion(轉動)函式
+```
+1.把glutMotionFunc(motion)/glutMouseFunc(mouse);加入
+2.設好x,y,z ,oldx,oldy 。
+3.在display裡 多加 glPushMatrix(); (備份矩陣)和 glPopMatrix();(還原矩陣)和 glTranslatef( (x-150)/150.0 ,-(y-150)/150.0 ,z); (移動)! 記得y座標要加負號!
+4.將motion裡的寫好。 mouse裡寫的是為了解決圖會瞬間移動的問題。
+☆更改背景顏色 glClearColor( 0 , 0 , 0 , 1)  R G B A (A為半透明功能，目前沒有開)☆
+
+```
+```c
+#include <GL/glut.h>
+#include <stdio.h>
+float x=0,y=0,z=0;
+int oldX=0,oldY=0;
+void display()
+{
+    glClearColor( 0.8 , 0.8 , 0.8 , 1);///R G B A (A為半透明功能，目前沒有開)
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glTranslatef( (x-150)/150.0 ,-(y-150)/150.0 ,z);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int mouseX,int mouseY)
+{
+}
+void mouse(int botton,int state,int mouseX,int mouseY)
+{///為了解決圖會瞬間移動的問題
+    oldX=mouseX; oldY=mouseY;
+}
+void motion(int mouseX,int mouseY)
+{
+    x+=(mouseX-oldX);
+    oldX=x;
+    y+=(mouseY-oldY);
+    oldY=y;
+    display();
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05 keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);///鍵盤
+    glutMotionFunc(motion);///滑鼠轉動
+    glutMouseFunc(mouse);///滑鼠
+
+    glutMainLoop();
+}
 
 ```
 
-# 
+# ◇將scale(縮放)加入
 ```
+1.將先前的x,y設成150，讓他在畫面中間。
+2.增加scale=1.0。 並把glScalef(scale ,scale,scale);加入
+3.將上一個motion裡的函式，改成:
+      if(mouseX-oldX>0) scale*=1.01;(如果滑鼠往右，則放大)
+      if(mouseX-oldX<0) scale*=0.99;(如果滑鼠往左，則縮小)
+```
+```c
+#include <GL/glut.h>
+#include <stdio.h>
+float x=150,y=150,z=0,scale=1.0;
+int oldX=0,oldY=0;
+void display()
+{
+    glClearColor( 0.8 , 0.8 , 0.8 , 1);///R G B A (A為半透明功能，目前沒有開)
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glTranslatef( (x-150)/150.0 ,-(y-150)/150.0 ,z);
+        glScalef(scale ,scale,scale);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int mouseX,int mouseY)
+{
+}
+void mouse(int botton,int state,int mouseX,int mouseY)
+{///為了解決圖會瞬間移動的問題
+    oldX=mouseX; oldY=mouseY;
+}
+void motion(int mouseX,int mouseY)
+{
+    if(mouseX-oldX>0) scale*=1.01;///當滑鼠往右，則放大
+    if(mouseX-oldX<0) scale*=0.99;///當滑鼠往左，則縮小
+    ///x+=(mouseX-oldX);
+    oldX=x;
+   /// y+=(mouseY-oldY);
+    oldY=y;
+    display();
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05 keyboard");
 
-```
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);///鍵盤
+    glutMotionFunc(motion);///滑鼠轉動
+    glutMouseFunc(mouse);///滑鼠
 
-# 
-```
-
-```
-
-# 
-```
+    glutMainLoop();
+}
 
 ```
 
