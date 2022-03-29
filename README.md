@@ -535,13 +535,373 @@ int main(int argc, char** argv)
 
 ```
 
-# 
-```
-
-```
-
-# 
-```
-
-```
 ## 第六周
+# 老師的程式範例:Light Material.exe
+```
+1.左上Screen-space view 視窗，按右鍵可變換Model模型。(圓圈、海豚、玫瑰...等)
+2.左下World-space view 視窗，按右鍵可以變換Material材質。(銅質、銀質、紅寶石...等)
+3.右邊Command manipulation window 視窗可以改想弄的程式。(材質、燈光、聚光..等)
+4.Glfloat light_pos[]={ x , y , z , 1}; 是調整光的照射位置。
+5.glLightfv(GL_LIGHT0, GL_POSITION ,light_pos) ; 前面的fv是指 float vector 
+            GL_LIGHT0 為第幾個燈、GL_POSITION為設定它的位置
+6.剩下的ka kd ks都是調光的性質。
+```
+☆Amblet 無所不在的光、 Diffuse 角度光、 Specular特別的點光、vector陣列☆
+
+# 建立Glut專案!
+1.複製下面這兩段程式:
+```c++
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+///----///
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0); ///打開/建立燈光
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+```
+2.建立好程式:
+記得第二段程式碼必須放在glutCreateWindow和glutMainLoop之間程式才會執行!
+        glEnable(GL_LIGHT0);  為打開/建立燈光 、
+        glEnable(GL_DEPTH_TEST);為開啟深度功能。
+```c++
+#include <GL/glut.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };///z的加負號
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glColor3f(1,1,0);
+        glutSolidTeapot( 0.3 );
+    glutSwapBuffers();
+}
+int main( int argc ,char **argv){
+    glutInit(&argc , argv);
+    glutInitDisplayMode( GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+    glutCreateWindow("week06 Light");
+    ///複製的程式碼要放glutCreateWindow內!!
+
+    glutDisplayFunc(display);
+
+    glEnable(GL_DEPTH_TEST);///開啟深度功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0); ///打開/建立燈光
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+    glutMainLoop();
+    ///之後要放在glutMainLoop以前!!
+
+}
+```
+3.將上周的滑鼠(mouse)和轉動(rotate)加入(滑鼠左右就能放大縮小圖形)
+```c++
+#include <GL/glut.h>
+#include <stdio.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };///z的加負號
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+float x=150,y=150,z=0,scale=1.0;
+int oldX=0,oldY=0;
+void display()
+{
+    glClearColor( 0.8 , 0.8 , 0.8 , 1);///R G B A (A為半透明功能，目前沒有開)
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glTranslatef( (x-150)/150.0 ,-(y-150)/150.0 ,z);
+        glScalef(scale ,scale,scale);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int mouseX,int mouseY)
+{
+}
+void mouse(int botton,int state,int mouseX,int mouseY)
+{///為了解決圖會瞬間移動的問題
+    oldX=mouseX; oldY=mouseY;
+}
+void motion(int mouseX,int mouseY)
+{
+    if(mouseX-oldX>0) scale*=1.01;///當滑鼠往右，則放大
+    if(mouseX-oldX<0) scale*=0.99;///當滑鼠往左，則縮小
+    ///x+=(mouseX-oldX);
+    oldX=x;
+   /// y+=(mouseY-oldY);
+    oldY=y;
+    display();
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05 keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);///鍵盤
+    glutMotionFunc(motion);///滑鼠轉動
+    glutMouseFunc(mouse);///滑鼠
+
+
+    glEnable(GL_DEPTH_TEST);///開啟深度功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0); ///打開/建立燈光
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+    glutMainLoop();
+}
+```
+
+
+# 4.改成可用滑鼠轉動(rotate):
+    先設定一個angle數為0，把glRotatef(angle,0,1,0); 放進矩陣
+    glRotatef(angle,0,1,0); 指對y軸旋轉。
+    最後在motion設定好用滑鼠控制角度  angle += (mouseX-oldX);
+```c++
+#include <GL/glut.h>
+#include <stdio.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };///z的加負號
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+float x=150,y=150,z=0,scale=1.0,angle=0;
+int oldX=0,oldY=0;
+void display()
+{
+    glClearColor( 0.8 , 0.8 , 0.8 , 1);///R G B A (A為半透明功能，目前沒有開)
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glTranslatef( (x-150)/150.0 ,-(y-150)/150.0 ,z);
+        glRotatef(angle,0,1,0);///對y軸旋轉
+        glScalef(scale ,scale,scale);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int mouseX,int mouseY)
+{
+}
+void mouse(int botton,int state,int mouseX,int mouseY)
+{///為了解決圖會瞬間移動的問題
+    oldX=mouseX; oldY=mouseY;
+}
+void motion(int mouseX,int mouseY)
+{
+    angle += (mouseX-oldX);
+    ///if(mouseX-oldX>0) scale*=1.01;///當滑鼠往右，則放大
+    ///if(mouseX-oldX<0) scale*=0.99;///當滑鼠往左，則縮小
+    ///x+=(mouseX-oldX);
+    oldX=mouseX;
+   /// y+=(mouseY-oldY);
+    oldY=mouseY;
+    display();
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05 keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);///鍵盤
+    glutMotionFunc(motion);///滑鼠轉動
+    glutMouseFunc(mouse);///滑鼠
+
+
+    glEnable(GL_DEPTH_TEST);///開啟深度功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0); ///打開/建立燈光
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+    glutMainLoop();
+}
+
+```
+# 5. 利用keybroad 改變移動、轉動、縮放用法:
+(1)先設一個now (1.移動 2.轉動 3.縮放)，
+(2)在keybroad 寫好按下哪個鍵會是哪種方法:
+    if( key=='1'||key=='w'||key=='W') now=1;
+    if( key=='2'||key=='e'||key=='E') now=2;
+    if( key=='3'||key=='r'||key=='R') now=3;
+(3)再去motion將now對應的方法寫入 :
+    if(now==1){///移動
+        x+=(mouseX-oldX);
+        y+=(mouseY-oldY);
+    }
+    else if(now==2){///轉動
+        angle += (mouseX-oldX);
+    }
+    else if(now==3){///縮放
+        if(mouseX-oldX>0) scale*=1.01;///當滑鼠往右，則放大
+        if(mouseX-oldX<0) scale*=0.99;///當滑鼠往左，則縮小
+    }
+```c++
+#include <GL/glut.h>
+#include <stdio.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };///z的加負號
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+float x=150,y=150,z=0,scale=1.0,angle=0;
+int oldX=0,oldY=0 ,now=1;///1.移動 2.轉動 3.縮放
+void display()
+{
+    glClearColor( 0.8 , 0.8 , 0.8 , 1);///R G B A (A為半透明功能，目前沒有開)
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glTranslatef( (x-150)/150.0 ,-(y-150)/150.0 ,z);
+        glRotatef(angle,0,1,0);///對y軸旋轉
+        glScalef(scale ,scale,scale);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int mouseX,int mouseY)
+{
+    if( key=='1'||key=='w'||key=='W') now=1;
+    if( key=='2'||key=='e'||key=='E') now=2;
+    if( key=='3'||key=='r'||key=='R') now=3;
+}
+void mouse(int botton,int state,int mouseX,int mouseY)
+{///為了解決圖會瞬間移動的問題
+    oldX=mouseX; oldY=mouseY;
+}
+void motion(int mouseX,int mouseY)
+{
+    if(now==1){///移動
+        x+=(mouseX-oldX);
+        y+=(mouseY-oldY);
+    }
+    else if(now==2){///轉動
+        angle += (mouseX-oldX);
+    }
+    else if(now==3){///縮放
+        if(mouseX-oldX>0) scale*=1.01;///當滑鼠往右，則放大
+        if(mouseX-oldX<0) scale*=0.99;///當滑鼠往左，則縮小
+    }
+    oldX=mouseX;
+    oldY=mouseY;
+    display();
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05 keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);///鍵盤
+    glutMotionFunc(motion);///滑鼠轉動
+    glutMouseFunc(mouse);///滑鼠
+
+
+    glEnable(GL_DEPTH_TEST);///開啟深度功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0); ///打開/建立燈光
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+    glutMainLoop();
+}
+
+```
