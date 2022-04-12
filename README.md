@@ -912,12 +912,14 @@ int main(int argc, char** argv)
  3.GLfloat light_ks 影響高光的部分。
 
 ## ◇實作(利用GLUT範例、和放在source的):
+```
  1.GLUT程式碼理解: 
-
     callback會呼叫display()  keyboard()  mouse() motion() 函式、前面有些是前幾次上課教的          (ex:glTranslatef()和glRotatef()等等)
  2.打光的程式碼:打光的陣列 、打光的函式在159~172的程式碼
  3. 複製第6週的light程式碼(會看到打光的黃色茶壺)
+```
 ## ◇將3D模型檔加入，需要source 裡的 glm.h glm.c，用lightmaterial.cpp來學習:
+```
  1.加入include "glm.h"在程式碼 。
     並將void display()裡的glutSolidTeapot( 0.3 ); 改成呼叫 drawmodel();///呼叫畫模型
     ☆#include < >引用系統裡的檔
@@ -930,7 +932,7 @@ int main(int argc, char** argv)
   glm.cpp是讀和畫等等3D模型程式碼(第三步畫圖的程式都在裡面)、glm.h是為了可以用那些方法。
  6.最後專案(weel088 model)按右鍵 add files... ->將glm.cpp加進
  ☆3D模型檔案會有兩個!  .mtl檔是material的縮寫，.obj檔放3D模型的資料(裡面有存v 頂點、vn法向量、f 面)☆
-
+```
 ```c++
 #include <GL/glut.h>
 #include "glm.h"
