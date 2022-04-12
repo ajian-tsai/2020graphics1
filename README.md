@@ -906,20 +906,97 @@ int main(int argc, char** argv)
 
 ```
 ## 第8週
-## 
+## ◇複習上課範例程式:Light & Material 打光/模型
+ 1.GLfloat light_ka 調光的範圍。
+ 2.GLfloat light_kd 可調光的顏色。
+ 3.GLfloat light_ks 影響高光的部分。
+
+## ◇實作(利用GLUT範例、和放在source的):
+ 1.GLUT程式碼理解: 
+
+    callback會呼叫display()  keyboard()  mouse() motion() 函式、前面有些是前幾次上課教的          (ex:glTranslatef()和glRotatef()等等)
+ 2.打光的程式碼:打光的陣列 、打光的函式在159~172的程式碼
+ 3. 複製第6週的light程式碼(會看到打光的黃色茶壺)
+## ◇將3D模型檔加入，需要source 裡的 glm.h glm.c，用lightmaterial.cpp來學習:
+ 1.加入include "glm.h"在程式碼 。
+    並將void display()裡的glutSolidTeapot( 0.3 ); 改成呼叫 drawmodel();///呼叫畫模型
+    ☆#include < >引用系統裡的檔
+    #include " " 引用同目錄裡的檔☆
+ 2.加進GLMmodel* pmodel = NULL;     是指向GLMmode模型的指標，NULL代表還沒好。
+ 3.複製畫3D模型的程式碼 ( pmodel = glmReadOBJ("data/soccerball.obj"); 會去找模型檔案並加     入)
+ 4.將要用的模型資料夾放進working dir 目錄(在freeglut資料夾的bin裡)，將data資料夾放進去。
+ 5.將glm.h和glm.c 放進專案的資料夾裡 (glm.c需要改檔名成glm.cpp 才能使用)。
+
+  glm.cpp是讀和畫等等3D模型程式碼(第三步畫圖的程式都在裡面)、glm.h是為了可以用那些方法。
+ 6.最後專案(weel088 model)按右鍵 add files... ->將glm.cpp加進
+ ☆3D模型檔案會有兩個!  .mtl檔是material的縮寫，.obj檔放3D模型的資料(裡面有存v 頂點、vn法向量、f 面)☆
 
 ```c++
+#include <GL/glut.h>
+#include "glm.h"
+GLMmodel* pmodel = NULL;///指到GLMmode模型的指標，NULL代表還沒好
+void
+drawmodel(void)
+{
+    if (!pmodel) {
+	pmodel = glmReadOBJ("data/dolphins.obj");///找模型的位置
+	if (!pmodel) exit(0);
+	glmUnitize(pmodel);
+	glmFacetNormals(pmodel);
+	glmVertexNormals(pmodel, 90.0);
+    }
 
-```
-## 
+    glmDraw(pmodel, GLM_SMOOTH);
+}///用來畫3D模型的程式碼
 
-```c++
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };///z的加負號
 
-```
-## 
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
 
-```c++
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glColor3f(1,1,0);
+        ///glutSolidTeapot( 0.3 );
+        drawmodel();///呼叫畫模型
+    glutSwapBuffers();
+}
+int main( int argc ,char **argv){
+    glutInit(&argc , argv);
+    glutInitDisplayMode( GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+    glutCreateWindow("week08 model");
+    ///複製的程式碼要放glutCreateWindow內!!
 
+    glutDisplayFunc(display);
+
+    glEnable(GL_DEPTH_TEST);///開啟深度功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0); ///打開/建立燈光
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+    glutMainLoop();
+    ///之後要放在glutMainLoop以前!!
+
+}
 ```
 ## 
 
