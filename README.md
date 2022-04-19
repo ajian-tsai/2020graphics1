@@ -1000,8 +1000,111 @@ int main( int argc ,char **argv){
 
 }
 ```
-## 
+## 第9週
+##  ◇上課範例程式:Texture.exe 貼圖
+```
+  glTexCoord2f( 0.0 , 0.0); (貼圖左下角是(0 , 0)逆時鐘算頂點，跟頂點的座標位置不一樣)
+```
+##  ◇實作1:設定好OpenCV
+moodle下載opencv 2.1.0 win32 vs2008 (選第二個 add Path，也不要改目錄)
+    ☆安裝完Path會多opencv 所以codeblocks要重開 。bin(執行檔)
+1.開個空的檔案 
+2.寫進程式碼:
+```c++
+#include <opencv/highgui.h>
+int main()
+{///Ipl: Intel Perfromance Library
+    IplImage * img = cvLoadImage("9.png");///讀圖
+    cvShowImage("week09",img);///開個視窗，秀圖
+    cvWaitKey( 0 ); ///等待按任意鍵
+}
+```
+3.要設定才能使用 include 目錄 / Lib 目錄 / 方法:
 
+    在右上settings/compiler -> Search directories/Compiler裡add C:\OpenCV2.1\include
+
+        settings/compiler -> Search directories/Linker 裡 add  C:\OpenCV2.1\lib
+
+        settings/compiler -> Linker settings    add cv210、cxcore210、highgui210
+
+        圖檔跟.cpp檔放在一起就能執行
+##  ◇實作2:結合OpenCV和OpenGL
+1.開一個新的GLUT檔案
+2.將之前 茶壺程式碼(openGL) 和 剛剛的openCV程式碼 修改後 結合在一起
+```c++
+#include <GL/glut.h>
+#include <opencv/highgui.h>
+void myTexture()///改成void，因為程式碼不能有兩個main
+{
+    IplImage * img = cvLoadImage("9.png");///讀圖
+    cvShowImage("opencv",img);///開個視窗，秀圖
+    ///cvWaitKey( 0 ); ///可以不用寫，因為有glutMainLoop();卡住
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glutSolidTeapot( 0.3 );
+    glutSwapBuffers();
+
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week09");
+
+    glutDisplayFunc(display);
+    myTexture();
+
+    glutMainLoop();
+}
+```
+3.此時圖檔要放在freeglut\bin資料夾裡!!!!!
+☆此時貼圖並沒有貼在茶壺上!!!☆
+4.去老師的網站複製貼圖的程式碼(改掉原本的void mytexture()，在下面的mytexture("圖片檔")):
+   https://gist.github.com/jsyeh/5ed01210559721ec71b659b3ffed2dd7
+```c++
+#include <GL/glut.h>
+#include <opencv/highgui.h>
+#include <opencv/highgui.h> ///使用 OpenCV 2.1 比較簡單, 只要用 High GUI 即可
+#include <opencv/cv.h>
+#include <GL/glut.h>
+int myTexture(char * filename)
+{
+    IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCV轉色彩 (需要cv.h)
+    glEnable(GL_TEXTURE_2D); ///1. 開啟貼圖功能
+    GLuint id; ///準備一個 unsigned int 整數, 叫 貼圖ID
+    glGenTextures(1, &id); /// 產生Generate 貼圖ID
+    glBindTexture(GL_TEXTURE_2D, id); ///綁定bind 貼圖ID
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖T, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖S, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// 貼圖參數, 放大時的內插, 用最近點
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// 貼圖參數, 縮小時的內插, 用最近點
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
+    return id;
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glutSolidTeapot( 0.3 );
+    glutSwapBuffers();
+
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week09");
+
+    glutDisplayFunc(display);
+    myTexture("9.png");///圖檔從這讀入
+
+    glutMainLoop();
+}
+
+```
+##
 ```c++
 
 ```
