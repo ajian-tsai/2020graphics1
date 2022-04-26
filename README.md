@@ -1106,6 +1106,7 @@ int main(int argc,char ** argv)
 ```
 ## 第10週
 ## ◇實作背景貼圖:
+```
   1.將freeglut資料夾、OpenCV-2.1.0裝好 (需重開codeblocek)。並開一個新的Glut專案。
   2.將OpenCV三個(目錄 / Lib 目錄 / 方法)設定完成。
   3.複製上周最後的程式碼 (texture)、下載一張earth.jpg放到freeglut\bin資料夾。
@@ -1114,6 +1115,7 @@ int main(int argc,char ** argv)
        glTexCoord2f( 0 , 1); glVertex2f( -1, -1);  左下，記得貼圖是逆時針座標和頂點不一樣
     glEnd();
     將圖片定位。
+```
 ```c++
 void display()
 {
