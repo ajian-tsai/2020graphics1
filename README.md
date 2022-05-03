@@ -1196,10 +1196,203 @@ int main(int argc,char ** argv)
 }
 ```
 ## 第11週
+## 上周glm 模型實作
+```
+1. 將freeglut 弄好、OpenCV2.1 裝好並設定(三個)好、重開codeblock。
+2.開GLUT專案。
+3.下載好的模型 .zip檔解壓縮後，模型裡data資料夾的檔案放到 freeglut\bin\data裡!
+4.寫程式:
+```
+```c++
+#include <opencv/highgui.h>
+int main()
+{///Ipl: Intel Perfromance Library
+    IplImage * img = cvLoadImage("data/Diffuse.jpg");///讀圖
+    cvShowImage("week11",img);///開個視窗，秀圖
+    cvWaitKey( 0 ); ///等待按任意鍵
+}
+```
+# 把圖貼到茶壺上:
+(上半)複製老師的myTexture.cpp程式，(下半)複製上周week10_texture_backgound的display和main，並把圖檔改為 data/Diffuse.jpg
+```c++
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
+#include <GL/glut.h>
+int myTexture(char * filename)
+{
+    IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCV轉色彩 (需要cv.h)
+    glEnable(GL_TEXTURE_2D); ///1. 開啟貼圖功能
+    GLuint id; ///準備一個 unsigned int 整數, 叫 貼圖ID
+    glGenTextures(1, &id); /// 產生Generate 貼圖ID
+    glBindTexture(GL_TEXTURE_2D, id); ///綁定bind 貼圖ID
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖T, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖S, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// 貼圖參數, 放大時的內插, 用最近點
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// 貼圖參數, 縮小時的內插, 用最近點
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
+    return id;
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glutSolidTeapot( 0.3 );
+    glutSwapBuffers();
+
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week11_Gundam");
+
+    glutDisplayFunc(display);
+    myTexture("data/Diffuse.jpg");///圖檔從這讀入
+
+    glutMainLoop();
+}
+```
+# 將gundam模型讀進去:
+```
+ 1.去 jsyeh.org/3dcg10 下載source.zip 用glm.h、glm.c、transformation.c 
+       將glm.c改檔名為glm.cpp，將glm.cpp 、transformation.c 和glm.h放到 專案資料夾(main旁)。
+ 2.到codeblock→點專案右鍵 Add File 加入 glm.cpp(為了include)
+ 3.加入#include "glm.h" 、GLMmodel * pmodel =NULL; (設定目前模型是沒有的)。和改display裡的程式
+★" "指在專案目錄。< >在系統找★
+ 4.將貼圖位置貼好! 直接點Diffuse圖檔 進小畫家 進行上下反轉。
+```
+```c++
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        if(pmodel == NULL){
+            pmodel = glmReadOBJ("data/Gundam.obj");///讀進模型
+            glmUnitize( pmodel );///換算成unit單位大小(-1~+1)
+            glmFacetNormals( pmodel );///重新計算模型每個面的法向量
+            glmVertexNormals( pmodel, 90);///重新計算模型Vertex的法向量
+        }
+        glmDraw(pmodel,GLM_TEXTURE);///模型上畫貼圖
+    glutSwapBuffers();
+}
+```
+# 將3D模型的深度功能打開:
+```
+1. 在main函式 glutMainLoop() 之前，加上glEnable(GL_DEPTH_TEST); 開啟3D深度。
+2.讓他轉起來:設定angle變數，在display加上glPushMatrix、glRotatef、glmDraw、glPopMatrix並angle要+1。重要的是要在main加glutIdleFunc(display);//使他一定時間呼叫display。
+```
+```c++
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
+#include <GL/glut.h>///<>在系統找
+#include "glm.h"  ///""指在專案目錄找glm.h
+GLMmodel * pmodel =NULL; ///一開始沒有模型檔
+int myTexture(char * filename)
+{
+    IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCV轉色彩 (需要cv.h)
+    glEnable(GL_TEXTURE_2D); ///1. 開啟貼圖功能
+    GLuint id; ///準備一個 unsigned int 整數, 叫 貼圖ID
+    glGenTextures(1, &id); /// 產生Generate 貼圖ID
+    glBindTexture(GL_TEXTURE_2D, id); ///綁定bind 貼圖ID
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖T, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖S, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// 貼圖參數, 放大時的內插, 用最近點
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// 貼圖參數, 縮小時的內插, 用最近點
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
+    return id;
+}
+float angle=0;
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        if(pmodel == NULL){
+            pmodel = glmReadOBJ("data/Gundam.obj");///讀進模型
+            glmUnitize( pmodel );///換算成unit單位大小(-1~+1)
+            glmFacetNormals( pmodel );///重新計算模型每個面的法向量
+            glmVertexNormals( pmodel, 90);///重新計算模型Vertex的法向量
+        }
+
+    glPushMatrix();
+        glRotatef(angle,0,1,0);
+        glmDraw(pmodel, GLM_TEXTURE);
+    glPopMatrix();
+
+    glutSwapBuffers();
+    angle += 0.1;
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week11_Gundam");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+    myTexture("data/Diffuse.jpg");///圖檔從這讀入
+    glEnable(GL_DEPTH_TEST);///開啟深度功能
+
+    glutMainLoop();
+}
+```
+# 運用MAYA切割模型:
+```
+1.進入MAYA，設定好輸出(影片有教學)，讀進模型，選取你要的部位，save as →點obj檔模式儲存。
+   搜尋maya obj 檔案影片→https://www.youtube.com/watch?v=D4a7cNFF9kQ
+2.切割完後，放進一樣放進freeglut\bin\data，再分別讀進身體部分，Push/Pop移動轉動之後就能動了。
+```
+# 對特定軸旋轉:
+```
+1.建好 身體 跟 手 的部分。(目前用teapot做示範)
+2.在display 把body跟hand 顯示，並設好 glTranslatef、glRotatef、angle。
+3.在main裡加上glutIdleFunc(display);
+```
+```c++
+#include <GL/glut.h>
+void hand(){///設定好手的部分
+    glColor3f(0,1,0);
+    glutSolidTeapot( 0.2 );
+}
+void body(){///設定好身體的部分
+    glColor3f(0,0.5,0.5);
+    glutSolidTeapot( 0.3 );
+}
+float angle=0;
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        body();
+        glPushMatrix();
+            glTranslatef(0.5 , 0.2 ,0);///移到右邊
+            glRotatef(angle, 0 , 0 ,1);///旋轉
+            glTranslatef(0.3 , 0 ,0);
+            hand();
+        glPopMatrix();
+    glutSwapBuffers();
+    angle+=0.1;
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week11_TRT");
+
+    glutIdleFunc(display);///一段時間再去跑一次display。
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+```
+# 
+```
+
+```
 ```c++
 
 ```
-## 
+# 
+```
+
+```
 ```c++
 
 ```
