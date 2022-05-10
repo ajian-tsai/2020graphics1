@@ -1382,17 +1382,138 @@ int main(int argc,char ** argv)
     glutMainLoop();
 }
 ```
-# 
+## 第12周
+# ◇Transformation.exe範例:
 ```
-
+ 1. 在下方Command manipulation window視窗右鍵可以swap 移動(translate)跟轉動(rotate)。
+ 2.自轉:(由下往上讀程式碼)
+  glTranslatef先時，是模型整個被移動; 
+  glRotatef，會是車子中心軸轉。
+  glScalef和glbegin建好一台車子。
+ 3.公轉:(由下往上讀程式碼)
+   glRotatef先時，是車子繞中心軸旋轉。
+   glTranslatef，是模型整個被移動(想像他被移到大盤子右邊);
+   glScalef和glbegin建好一台車子。
 ```
 ```c++
 
 ```
-# 
+# ◇其他範例:
+```
+1. 到120.125.80.50/GL/ 網站看T-R-T對特定軸轉動練習
+2.左邊畫面畫完，右邊myDrawObject會增加 並且 它可以換位置(似圖層意思)
+  可以重新整理網頁清除剛剛的操作。
+3.angle點一下再按空白鍵，就能改變值。
+  將 物件(myDrawObject) 和 移動(Translate) 放在 旋轉glRotate下方就能轉。
+  上方程式會影響下方的程式碼，所以才要放在下方。
+4.點Translatef變紅色後，再到左邊的視窗就能拖移位置。(可讓中心軸移動)
+  glPushMatrix(x,y,z);
+     glRotatef(angle,0,0,1); //會使下面整個的東西選轉。       
+     glTranslatef(-x,-y,0) //往左下角移動後，會是中心點。(其中一個)
+     myDrawObject(1); //物件
+  glPopMatrix();
+5.把另外一個glTranslatef()擺到 第4點 glRotatef()上面。  
+```
+```c++
+   glPushMatrix();
+      glTranslatef(x,y,z);//會讓物體移到這個位置
+      glRotatef(angle,0,0,1); //會使下面整個的東西選轉。       
+      glTranslatef(x,y,z); //使它成為物體的旋轉中心點!
+      myDrawObject(1); //物件
+   glPopMatrix();  
+```
+# ◇實作:
+```
+1.先開一個GLUT專案
+2.貼完三段程式碼!
+3.新增一個身體跟手茶壺，並修改 手的 旋轉中心點 跟 位置。(可一步一步來比較好理解)
+   glTranslatef(0.4,0.15,0); /// (3).把它往右放(圖的綠色線條)
+   glRotatef(angle,0,0,1); /// (2).旋轉
+   glTranslatef(0.2,0,0); /// (1).旋轉中心放到世界中心，希望 手茶壺的中心旋轉軸 在把手位置，因大小是0.2，才往右0.2。(原本在橘色點，要移到粉紅色點)
+```
+```c++
+#include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);
+    glutSolidTeapot( 0.3 );///白身體
+    glPushMatrix();
+        glTranslatef(0.4,0.15,0);///3.把它往右放
+        glRotatef(angle,0,0,1);///2.旋轉
+        glTranslatef(0.2,0,0);///1.旋轉中心放到世界中心，希望 手茶壺的中心旋轉軸 在把手位置，因大小是0.2，才往右0.2
+        glColor3f(1,0,0);
+        glutSolidTeapot( 0.2 );///紅手臂
+    glPopMatrix();
+    glutSwapBuffers();
+    angle+=0.1;
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week12");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+
+
+    glutMainLoop();
+}
+
+```
+# ◇可運用到作業的程式:
+```c++
+#include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);
+    glutSolidTeapot( 0.3 );///白身體
+    glPushMatrix();
+        glTranslatef(0.4,0.15,0);///3.把它往右放
+        glRotatef(angle,0,0,1);///2.旋轉
+        glTranslatef(0.2,0,0);///1.旋轉中心放到世界中心，希望 手茶壺的中心旋轉軸 在把手位置，因大小是0.2，才往右0.2
+        glColor3f(1,0,0);
+        glutSolidTeapot( 0.2 );///紅手臂
+
+        glPushMatrix();
+            glTranslatef(0.4,0.15,0);///3.把它往右放
+            glRotatef(angle,0,0,1);///2.旋轉
+            glTranslatef(0.2,0,0);///1.旋轉中心放到世界中心，希望 手茶壺的中心旋轉軸 在把手位置，因大小是0.2，才往右0.2
+            glColor3f(1,0,0);
+            glutSolidTeapot( 0.2 );///下面手肘
+        glPopMatrix();
+
+    glPopMatrix();
+    glutSwapBuffers();
+    angle+=0.1;
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week12");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+
+
+    glutMainLoop();
+}
+
+```
+# ◇:
 ```
 
 ```
-```c++
+# ◇:
+```
+
+```
+# ◇:
+```
 
 ```
