@@ -1395,9 +1395,6 @@ int main(int argc,char ** argv)
    glTranslatef，是模型整個被移動(想像他被移到大盤子右邊);
    glScalef和glbegin建好一台車子。
 ```
-```c++
-
-```
 # ◇其他範例:
 ```
 1. 到120.125.80.50/GL/ 網站看T-R-T對特定軸轉動練習
