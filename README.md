@@ -1500,10 +1500,138 @@ int main(int argc,char ** argv)
 
     glutMainLoop();
 }
+```
+## 第13周
+# ◇利用矩形:
+```
+1.加上glRectf(x1,y1,x2,y2);//矩形程式碼
+  ☆glutInitWindowSize(x,y);//可自行設定畫面大小
+2.再加一個Rect模擬手臂，並加上TRT程式。
+  畫glRectf(0.3,0.5,0.7,0.3); (在下面圖的原位)
+  TRT三步驟:
+  (1)將旋轉中心從(0.3 , 0.4)移到(0 , 0)。→glTranslatef(-0.3,-0.4,0);
+3.利用鍵盤mouse motion 來改變angle
+  增加mouse函式和motion讓他轉動的函式
+  並在main函式呼叫函式
+```
+```c++
+#include <GL/glut.h>
+float angle=45,oldX=0;
+void mouse(int button,int state,int x,int y)
+{
+    oldX=x;
+}
+void motion(int x,int y)
+{
+    angle+=(x-oldX);///改變角度量值
+    oldX=x;
+    glutPostRedisplay();///請他重新畫display
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);//白色
+    glRectf(0.3,0.5,-0.3,-0.5);///身體
+    glPushMatrix();//右手
+        glTranslatef(0.3,0.4,0);///3.把手一到哪個位置
+        glRotatef(angle,0.3,0.4,1);///2.旋轉
+        glTranslatef(-0.3,-0.4,0);///1.把旋轉中心放中間
+        glColor3f(0,1,0);//綠色
+        glRectf(0.3,0.5,0.7,0.3);
+    glPopMatrix();
+    glutSwapBuffers();
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutInitWindowSize(300,300);
+    glutCreateWindow("week12");
 
+    //glutIdleFunc(display);
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+
+    glutMainLoop();
+}
+```
+# ◇再增加TRT:
+```
+1.再加一個下手臂(和上手臂的步驟一樣)
+2.左邊手臂也出來(將右手臂座標正負相反，因為鏡射)
+```
+```c++
+///week13_rect_TRT_TRT
+#include <GL/glut.h>
+float angle=0,oldX=0;
+void mouse(int button,int state,int x,int y)
+{
+    oldX=x;
+}
+void motion(int x,int y)
+{
+    angle+=(x-oldX);///改變角度量值
+    oldX=x;
+    glutPostRedisplay();///請他重新畫display
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);//白色
+    glRectf(0.3,0.5,-0.3,-0.5);///身體
+    glPushMatrix();///右上手臂
+        glTranslatef(0.3,0.4,0);///3.把手一到哪個位置
+        glRotatef(angle,0.3,0.4,1);///2.旋轉
+        glColor3f(0,1,0);///綠色
+        glTranslatef(-0.3,-0.4,0);///1.把旋轉中心放中間
+        glRectf(0.3,0.5,0.7,0.3);
+            glPushMatrix();///下手臂
+                glTranslatef(0.7,0.4,0);///3.把手一到哪個位置
+                glRotatef(angle,0,0,1);///2.旋轉
+                glTranslatef(-0.7,-0.4,0);///1.把旋轉中心放中間
+                glColor3f(1,0,0);///紅色
+                glRectf(0.7,0.5,1.0,0.3);
+            glPopMatrix();
+    glPopMatrix();
+
+    glPushMatrix();///上手臂
+        glTranslatef(-0.3,0.4,0);///3.把手一到哪個位置
+        glRotatef(angle,0.3,-0.4,1);///2.旋轉
+        glColor3f(0,1,0);///綠色
+        glTranslatef(0.3,-0.4,0);///1.把旋轉中心放中間
+        glRectf(-0.3,0.5,-0.7,0.3);
+            glPushMatrix();///下手臂
+                glTranslatef(-0.7,0.4,0);///3.把手一到哪個位置
+                glRotatef(angle,0,0,1);///2.旋轉
+                glTranslatef(0.7,-0.4,0);///1.把旋轉中心放中間
+                glColor3f(1,0,0);///紅色
+                glRectf(-0.7,0.5,-1.0,0.3);
+            glPopMatrix();
+    glPopMatrix();
+    glutSwapBuffers();
+}
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutInitWindowSize(300,300);
+    glutCreateWindow("week13");
+
+    //glutIdleFunc(display);
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+
+
+    glutMainLoop();
+}
 ```
 # ◇:
 ```
+
+```
+```c++
 
 ```
 # ◇:
