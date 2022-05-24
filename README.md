@@ -1728,11 +1728,196 @@ int main(int argc,char ** argv)
 }
 
 ```
+## 第14周
+# ◇寫檔(File output):
+``
+1.先開一個empty 檔，存成.cpp檔。
+2.fopen()開啟檔案(可產生一個檔案)、fprintf() 寫入檔案、fclose()關閉檔案。
+   FILE * fout = fopen("檔名","模式"); FILE記得要大寫。
+   按齒輪會產生兩個檔案，當你按齒輪+執行會出現fopen裡寫的檔。
+```
+```c++
+#include <stdio.h>
+int main()
+{///將檔案指到fout，開啟檔案
+    FILE * fout = fopen("file.txt","w+");///("檔名"，"w+"是寫入模式)
+     printf("Hello world\n");
+    fprintf(fout,"Hello world");
+    fclose(fout);///關閉檔案
+}
+```
+# ◇讀檔(File Intput):
+```
+1.先開一個empty 檔，存成.cpp檔。
+2.FILE * fin = fopen("file.txt","r");//////打開檔案，讀入file.txt指到fin。
+  fscanf(fin,"%f",&angle);///讀到"檔名"檔案的浮點數，後面記得要&讀入。
+```
+```c++
+#include <stdio.h>
+int main()
+{///將檔案指到fout，開啟檔案
+    FILE * fout = fopen("file.txt","w+");///("檔名"，"w+"是寫入模式)
+    fprintf(fout,"3.1415926");
+    fclose(fout);///關閉檔案
+
+    float angle=0;
+    FILE * fin = fopen("file.txt","r");///打開檔案，讀入file.txt指到fin
+    fscanf(fin,"%f",&angle); ///讀到"檔名"檔案的浮點數，後面記得要&讀入。
+    printf("讀到了角度:%f",angle);//印出
+    fclose(fin);
+}
+```
+# ◇利用上週程式week13_moreTRT，用寫檔:
+```
+1.開新專案，複製上周的程式。
+2.先include <stdio.h>。
+3.創建一個FILE * fout =NULL;，並寫mywrite()函式。
+4.再motion函式裡，呼叫mywirte()。在motion裡打mywirte()
+  當我們轉動圖形角度，角度就會在小黑印出來。
+```
+```c++
+#include <stdio.h>
+///float angle[20];///上周的
+FILE *fout =NULL; //初始檔案為空的
+void mywrite(){
+    if(fout==NULL) fout = fopen("file.txt","w+");//如果是空的就開檔案
+
+    for(int i=0;i<20;i++){///因為我們angle有20個
+        printf("%.1f",angle[i]);///從小黑印出來
+        fprintf(fout,"%.1f",angle[i]);///從檔案印出
+    }
+}
+///第四步驟
+void motion(int x,int y)
+{
+    angle[angleID]+=(x-oldX);///改變角度量值///陣列數值改成angleID
+    mywrite(); ///寫入
+    oldX=x;
+    glutPostRedisplay();///請他重新畫display
+}
+```
+# ◇利用寫檔程式，加入讀檔進而產生動畫:
+```
+1.再開一個檔案，複製寫檔的程式。
+2.設定好fin ，並寫入myRead()函式。
+  FILE * fout =NULL, * fin =NULL; 把讀檔的檔案也設好。
+  if(fout !=NULL ){ fclose(fout); fout = NULL; } 當我們按下r時，fout不是空的就關掉他並清除
+  glutPostRedisplay();///重畫畫面，才會有效果。
+3.在keyboard函式寫進
+  if (key == 'r') myRead(); ///當按著r就會動，長按。
+  ☆當我們移動好圖形的動作後，長按r，他就會一直讀取我們剛剛寫入的angle值，之後myRead()會讀入，產生動作的效果。☆
+```
+```c++
+FILE *fout =NULL, * fin =NULL;//初始檔案為空的
+void mywrite(){
+    if(fout == NULL) fout = fopen("file.txt","w+");//如果是空的就開檔案
+
+    for(int i=0;i<20;i++){///因為我們angle有20個
+        printf("%.1f",angle[i]);///從小黑印出來
+        fprintf(fout,"%.1f ",angle[i]);///從檔案印出
+    }
+    printf("\n");
+    fprintf(fout ,"\n");
+}
+void myRead(){
+    if(fout !=NULL ){ fclose(fout); fout = NULL; }///當我們按下r時，fout不是空的就關掉他並清除
+    if( fin == NULL ) fin = fopen("file.txt","r");
+    for(int i=0;i<20;i++){
+        fscanf( fin, "%f" , &angle[i] );///讀入剛剛寫的角度
+    }
+    glutPostRedisplay();///重畫畫面
+}
+void keyboard(unsigned char key,int x, int y){
+    if(key == 'r') myRead();///當按著r就會動，長按
+    if(key=='0') angleID=0; ///當按下0時，angleID=0
+    if(key=='1') angleID=1;
+    if(key=='2') angleID=2;
+    if(key=='3') angleID=3;
+}
+```
+
+# ◇更改工作目錄到專案:
+```
+因原本的目錄在freeglut\bin，但我們希望產生的東西都放在專案裡頭。
+1.到我們專案的資料夾，將.cdp檔用notepad++打開
+2.將working_dir的位置改成 . ，存檔回到Codeblocks。
+  codeblocks會問你要不要重新執行，請按確認。
+3.此時執行時，會出問題，所以要將freeglut\bin 資料夾裡的freeglut.dll，複製到專案資料夾裡。
+複製好後就能執行:)
+```
+# ◇計時器 glutTimeFunc():
+```
+因為keyboard會由延遲，動畫會不順
+1.開啟新GLUT專案。
+2.寫程式:
+ glutTimerFunc(等多久時間, timer ,t參數)
+◆自動呼叫timer，簡化程式:
+1.在 timer函式裡呼叫自己。
+ 因為Main函式有glutTimerFunc(5000,timer, 0); 他會等五秒後再呼叫timer函式。
+ 之後函式裡面就會自己呼叫自己並顯示出來了。
+```
+```c++
+#include <stdio.h>
+#include <GL\glut.h>
+void timer(int t){
+    printf("起床，現在時間: %d\n",t);
+    glutTimerFunc(1000,timer, t+1);///再呼叫下一個timer
+}
+void display(){
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week14_auto_timer");
+
+    glutTimerFunc(5000,timer, 0);///設定五秒後，才會出現timer 0
+    ///glutTimerFunc(等多久時間, timer ,t參數)
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+```
+
+# ◇播放聲音:
+```
+1.利用 PlaySound() 先下載do.wav音檔
+2.先加#include <mmsystem.h> 
+3.在timer函式加PlaySound("do.wav", NULL , SND_ASYNC); 撥放do.wav聲音。
+```
+```c++
+#include <stdio.h>
+#include <GL\glut.h>
+#include <mmsystem.h>
+void timer(int t){
+    printf("起床，現在時間: %d\n",t);
+    PlaySound("do.wav", NULL , SND_ASYNC);
+    glutTimerFunc(1000,timer, t+1);///再呼叫下一個timer
+}
+void display(){
+}
+int main(int argc, char** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week14_auto_timer");
+
+    glutTimerFunc(5000,timer, 0);///設定五秒後，才會出現timer 0
+    ///glutTimerFunc(等多久時間, timer ,t參數)
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+```
 # ◇:
 ```
 
 ```
+```c++
+
+```
 # ◇:
 ```
+
+```
+```c++
 
 ```
