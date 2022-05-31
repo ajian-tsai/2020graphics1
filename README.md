@@ -1986,12 +1986,35 @@ void motion(int x,int y)
     glutPostRedisplay();
 }
 ```
-# ◇:
+# ◇擺動作動畫(作業):
 ```
-
+1.建立新的GLUT專案。
+2.更改working_dir 工作目錄。
+  →到專案資料夾，將cdp檔右鍵nope++打開，將working_dir 的地方改成 .
+  打開codeblocks按YES就行。
+3.將freeglut/bin 裡的freeglut.dull複製到專案目錄。
+4.將glm.h ，glm.cpp 及 模型檔放入data資料夾 放入專案資料夾。
+  記得要在codeblocks add glm.cpp。
+5.將模型導入
+  先放入指標GLMmodel * pmodel =NULL;
+  在display前寫進導入模型函式
+  在display放入
 ```
 ```c++
+///新加函式
+GLMmodel * myReadOne(char * filename){
+    GLMmodel * one==NULL;
+    if(one==NULL){
+        one = glmReadOBJ(filename);
+        glmUnitize(one);
+        glmFacetNormals(one);
+        glmVertexNormals(one,90);
+    }
+}
 
+///以下放入display
+if(body == NULL ) body= myReadOne("data/body.obj");
+glmDraw(body,GLM_TEXTURE|GLM_SMOOTH);
 ```
 # ◇:
 ```
