@@ -1916,6 +1916,10 @@ int main(int argc, char** argv)
   PlaySound( "檔名.wav" ,NULL,SND_ASYNC); 不等待(上週使用)。
 4.設定 上方Settings-Compiler Settings , Linker settings 要加入 winmm。
   這樣才能撥放聲音!
+5.上網找音檔wav，放到跟程式同一個目錄，就能撥放!
+  可在這裡找免費的:https://sound-effects.bbcrewind.co.uk/search
+★可藉由SND_ASYNC，加上輸入，就能快速切換音效，不需要等音效播完。★
+★這邊的wav會傳到音效卡再撥，PlaySound只能播放wav檔★
 ```
 ```c++
 #include <windows.h>
@@ -1933,19 +1937,54 @@ int main()
     }
 }
 ```
-# ◇:
+# ◇播放mp3檔:
 ```
-
-```
-```c++
-
-```
-# ◇:
-```
-
+1.去moodle下載 CMP3_MCI.h 放在同目錄裡。
+2.開新Empty File
+3.先#include "CMP3_MCI.h"  *記得是雙引號不是 < >"
+4.mp3.Load("檔名.mp3");和mp3.Play();，就能播放聲音
 ```
 ```c++
+#include "CMP3_MCI.h"///記得要放同目錄
+#include <stdio.h>
+CMP3_MCI mp3;///宣告變數
+int main()
+{
+    mp3.Load("Dream.mp3");
+    mp3.Play();
 
+    printf("等你輸入數字，輸入數字程式就卡住\n");
+    int n;///為了卡住程式，不要直接結束
+    scanf("%d",&n);
+}
+```
+# ◇動畫使他順暢:
+```
+1.開新GLUT專案，複製上周動畫程式。
+2.更改 keyboard()函式增加
+   if( key=='s') mywrite(); ///調好位置後，按S才一次存檔
+   motion()函式註解掉 mywrite(); ///只要移動位置就會存檔
+★存檔的內容會放在工作目錄freeglut/bin，也可以像上禮拜的調整存到專案裡。
+就能在那找到文字檔，複製位置比較快。★
+3.一樣存好位置後，一直按R就能動了
+```
+```c++
+void keyboard(unsigned char key,int x, int y){
+    if( key=='s') myrite(); ///調好後，按S才一次存檔
+    if(key == 'r') myRead(); 
+    if(key=='0') angleID=0; 
+    if(key=='1') angleID=1;
+    if(key=='2') angleID=2;
+    if(key=='3') angleID=3;
+}
+
+void motion(int x,int y)
+{
+    angle[angleID]+=(x-oldX);
+    ///mywrite();//這裡會一直存檔，所以註解掉
+    oldX=x;
+    glutPostRedisplay();
+}
 ```
 # ◇:
 ```
