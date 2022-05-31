@@ -1907,6 +1907,46 @@ int main(int argc, char** argv)
     glutMainLoop();
 }
 ```
+## 第15週
+# ◇播放聲音の不同方法:
+```
+1.開一個Empty File
+2.運用#include <windows.h>  。上週是用#include < mmsystem.h>
+3.PlaySound( "檔名.wav" , NULL, SND_SYNC);  等待，同步。
+  PlaySound( "檔名.wav" ,NULL,SND_ASYNC); 不等待(上週使用)。
+4.設定 上方Settings-Compiler Settings , Linker settings 要加入 winmm。
+  這樣才能撥放聲音!
+```
+```c++
+#include <windows.h>
+#include <stdio.h>
+int main()
+{
+    PlaySound("07072028.wav",NULL,SND_ASYNC);///NULL那邊如果有東西，會跟他一起出現
+    while(1){ ///藉由迴圈讓他一直執行
+        printf("請輸入:");
+        int n;
+        scanf("%d",&n);
+        if(n==1)PlaySound("re.wav",NULL,SND_ASYNC);
+        if(n==2)PlaySound("mi.wav",NULL,SND_ASYNC);
+        if(n==3)PlaySound("do.wav",NULL,SND_ASYNC);
+    }
+}
+```
+# ◇:
+```
+
+```
+```c++
+
+```
+# ◇:
+```
+
+```
+```c++
+
+```
 # ◇:
 ```
 
