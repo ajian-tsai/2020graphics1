@@ -2016,6 +2016,153 @@ GLMmodel * myReadOne(char * filename){
 if(body == NULL ) body= myReadOne("data/body.obj");
 glmDraw(body,GLM_TEXTURE|GLM_SMOOTH);
 ```
+## 第16週
+# ◇alpha內插公式:
+```
+1. angle = alpha*新角度 + (1-alpha)*舊角度。
+  alpha值為0.0~1.0。所以alpha=0 則為舊angle，alpha=1 則為新angle，其他介於新舊之間。
+```
+# ◇interpolation 內插實作(讓動畫angle變動順暢)：
+```
+1.開新glut專案，利用上禮拜的程式week15_angle_again程式
+2. 寫入新的myInterpolate函式、keyboard加入play鍵、myRead函式寫入讓他能新舊角度交換。
+   myInterpolate()函式：藉由新舊角度運算，算出每個angle。
+   keyboard()函式:藉由 t=0 ，呼叫myInterpolation()函式，放入 ( t %30 )/30.0 運算會介於                                                 0.0~1.0之間(作為alpha值的運算)，當我們 t 為30時，就又會變成0。
+   myRead()函式:使新舊角度交換，並重畫顯示畫面，就能看到順暢的動作。
+```
+```c++
+//3.更改myread for迴圈函式，當我們呼叫myRead則角度新舊交換才能
+void myRead(){
+    if(fout !=NULL ){ fclose(fout); fout = NULL; } ///當我們按下r時，fout不是空的就關掉他並清除
+    if( fin == NULL ) fin = fopen("file.txt","r");
+    for(int i=0;i<20;i++){
+        OldAngle[i]= NewAngle[i];///原來的新角度，變成舊角度  
+        fscanf(fin , "%f",&NewAngle[i]);///讀到新的角度
+        //fscanf( fin, "%f" , &angle[i] );///讀入剛剛寫的角度
+    }
+    glutPostRedisplay();///重畫畫面
+}
+//1.寫入myInterpolate 角度內插法
+float NewAngle[20],OldAngle[20];
+void myInterpolate(float alpha){
+    for(int i=0; i<20 ; i++){
+        angle[i] = alpha *NewAngle[i] + (1-alpha) * OldAngle[i];
+    }
+
+}
+//2.在keyboard新增play按鍵
+int t=0;
+void keyboard(unsigned char key,int x, int y){
+    if( key=='p'){///當我按play
+        if(t%30==0) myRead();
+        myInterpolate( (t%30)/30.0 );///給予alpha介於0.0~1.0的值
+        glutPostRedisplay();///重畫畫面
+        t++;
+    }
+  }
+```
+3.因為原本要一直按p才能動，但我們想要他自動跑。
+  將keyboard函式修改，並增加timer函式，讓他會依照時間呼叫自己。
+```c++
+//寫入timer函式
+void timer(int t){
+    if(t%50==0) myRead();///會計算出50個，則一秒會動50個，所以動作會比較順暢
+    myInterpolate( (t%50)/50.0 );
+    glutPostRedisplay();
+    glutTimerFunc(20,timer,t+1);//在呼叫自己
+}
+
+//修改keyboard的play
+void keyboard(unsigned char key,int x, int y){
+    if( key=='p'){///當我按play
+        //if(t%30==0) 
+        myRead();
+        glutTimerFunc(0,timer,0);    
+        //myInterpolate( (t%30)/30.0 );///alpha內插法 介於0.0~1.0的值
+        //glutPostRedisplay();///重畫畫面
+        //t++;
+    }
+```
+# ◇攝影機觀察：
+```
+1.藉由老師上課教材Projection.exe了解
+2. gluLookAt -> eye 是相機拍向人物的相機座標。(相機位置)
+   gluLookAt -> center是相機拍攝哪裡。(可以專拍手或是專拍頭，對eye那個點做變動)
+   gluLookAt -> up  是相機拍攝旋轉角度。(有點像是旋轉相機，對著center那個點旋轉)
+3.對下面command manipulation window視窗 右鍵 可選glOrtho看到拍攝框   
+```
+# ◇攝影機：
+```
+1.開新專案，留下static void resize()函式。
+   static void resize()函式，可讓視窗變化的時候，3D物件的長寬會跟著視窗比例變化，
+   就不會壓扁3D物件了。
+   aspect ratio 是長x寬比(x往右，y向下) ex: 1920x1080 , 1280x720 ,640x480 , 16:9 ,4:3。
+2.先#include<GL/glut.h>、
+  修改resize()函式變成reshape()、
+  main函式利用glutReshapeFunc(reshape);呼叫reshape。
+◇攝影運鏡：
+3.加入motion()函式，讓我們能用滑鼠調整看的角度，感受到運鏡。
+```
+```c++
+#include <GL/glut.h>
+
+//2.修改resize()函式變成reshape()。
+void reshape(int width, int height)///不能整數除法
+{ ///ar就是aspect ratio
+     float ar = (float) width / (float) height;
+
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);///為Matrix模式的 PROJECTION為3D變2D
+    glLoadIdentity();
+    gluPerspective( 60, ar , 0.1 , 100);
+
+    glMatrixMode(GL_MODELVIEW);///3D Model+view
+    glLoadIdentity() ;
+    gluLookAt( 0, 0, 3, //eye
+               0, 0, 0, //center
+               0, 1, 0);//up
+}
+//利用茶壺觀察
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glutSolidTeapot(1);
+    glutSwapBuffers();
+}
+
+//1.寫下glutReshapeFunc(reshape);
+int main(int argc,char ** argv)
+{
+    glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week16_camera");
+
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);///當我們改變視窗，則改變大小
+
+    glutMainLoop();
+}
+```
+```c++
+//加入motion函式
+void motion(int x,int y){
+    glMatrixMode(GL_MODELVIEW);///3D Model+view
+    glLoadIdentity();
+    gluLookAt((x-150)/150.0,(y-150)/150.0,3,
+                    0,0,0,
+                    0,1,0);
+    glutPostRedisplay();
+}
+//在main放入呼叫motion
+glutMotionFunc(motion);
+```
+# ◇:
+```
+
+```
+```c++
+
+```
 # ◇:
 ```
 
