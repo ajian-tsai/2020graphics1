@@ -2156,9 +2156,23 @@ void motion(int x,int y){
 //在main放入呼叫motion
 glutMotionFunc(motion);
 ```
-# ◇:
+## 第17週 
+# ◇一些小地方可以調整注意
 ```
-
+1.改變模型讀入的大小:
+  將GLMmodel * myReadOne(char * filename)函式裡的:
+  glmUnitize(one);改成glmScale(one,1/26.0);
+2.可用glDisable(GL_TEXTURE_2D); / glEnable(GL_TEXTURE_2D); 再需要的模型之間
+  開啟或關閉貼圖
+3.reshape()函式裡的
+  gluLookAt(0, 0 ,2.5 ,    0, 0, 0,   0, 1, 0);
+  可設定攝影機看的方向(更改第一個x,y,z的z軸)，如果打光有問題可以改打光的，
+  const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };///z的加負號
+4.圖片大小最好是正方形。
+5使用多張貼圖:
+  先宣告好貼圖 ex: int skin;。
+  在main()函式把貼圖檔案匯入ex:skin = myTexture("data/skin.png");
+  之後在display()你要貼的模型位置寫入ex: glBindTexture(GL_TEXTURE_2D, skin);
 ```
 ```c++
 
